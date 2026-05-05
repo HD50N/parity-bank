@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap11env:Envelope
+  xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="http://paritybank.com/transaction">
+  <soap11env:Body>
+    <tns:GetTransactionHistoryResponse>
+      <tns:GetTransactionHistoryResult>
+        <tns:account_id>ACC-001234</tns:account_id>
+        <tns:from_date>2024-01-01</tns:from_date>
+        <tns:to_date>2024-01-31</tns:to_date>
+        <tns:transaction_count>3</tns:transaction_count>
+        <tns:transactions>
+          <tns:TransactionItem>
+            <tns:id>TXN-99887</tns:id>
+            <tns:amount>-250.00</tns:amount>
+            <tns:date>2024-01-14T15:22:00</tns:date>
+            <tns:description>PURCHASE AT MERCHANT</tns:description>
+            <tns:type>DEBIT</tns:type>
+            <tns:balance_after>15234.50</tns:balance_after>
+          </tns:TransactionItem>
+          <tns:TransactionItem>
+            <tns:id>TXN-99886</tns:id>
+            <tns:amount>1000.00</tns:amount>
+            <tns:date>2024-01-13T09:00:00</tns:date>
+            <tns:description>DIRECT DEPOSIT PAYROLL</tns:description>
+            <tns:type>CREDIT</tns:type>
+            <tns:balance_after>15484.50</tns:balance_after>
+          </tns:TransactionItem>
+          <tns:TransactionItem>
+            <tns:id>TXN-99885</tns:id>
+            <tns:amount>-45.99</tns:amount>
+            <tns:date>2024-01-12T18:30:00</tns:date>
+            <tns:description>UTILITY PAYMENT</tns:description>
+            <tns:type>DEBIT</tns:type>
+            <tns:balance_after>14484.50</tns:balance_after>
+          </tns:TransactionItem>
+        </tns:transactions>
+      </tns:GetTransactionHistoryResult>
+    </tns:GetTransactionHistoryResponse>
+  </soap11env:Body>
+</soap11env:Envelope>

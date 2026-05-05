@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap11env:Envelope
+  xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="http://paritybank.com/transfer">
+  <soap11env:Body>
+    <tns:TransferFundsResponse>
+      <tns:TransferFundsResult>
+        <tns:confirmation_id>TRF-001001</tns:confirmation_id>
+        <tns:status>COMPLETED</tns:status>
+        <tns:timestamp>2024-01-15T10:30:00</tns:timestamp>
+        <tns:from_account_id>ACC-001234</tns:from_account_id>
+        <tns:to_account_id>ACC-005678</tns:to_account_id>
+        <tns:amount>500.00</tns:amount>
+        <tns:from_balance_after>14734.50</tns:from_balance_after>
+        <tns:to_balance_after>42600.00</tns:to_balance_after>
+        <tns:message>Transfer completed. Reference: RENT-JAN-2024</tns:message>
+      </tns:TransferFundsResult>
+    </tns:TransferFundsResponse>
+  </soap11env:Body>
+</soap11env:Envelope>

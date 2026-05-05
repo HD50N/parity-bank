@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap11env:Envelope
+  xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="http://paritybank.com/transfer">
+  <soap11env:Body>
+    <tns:TransferFunds>
+      <tns:from_account_id>ACC-001234</tns:from_account_id>
+      <tns:to_account_id>ACC-005678</tns:to_account_id>
+      <tns:amount>500.00</tns:amount>
+      <tns:reference>RENT-JAN-2024</tns:reference>
+    </tns:TransferFunds>
+  </soap11env:Body>
+</soap11env:Envelope>

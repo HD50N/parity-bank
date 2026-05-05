@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap11env:Envelope
+  xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="http://paritybank.com/account">
+  <soap11env:Body>
+    <tns:GetAccountBalanceResponse>
+      <tns:GetAccountBalanceResult>
+        <tns:account_id>ACC-001234</tns:account_id>
+        <tns:balance>15234.50</tns:balance>
+        <tns:currency>USD</tns:currency>
+        <tns:account_type>CHECKING</tns:account_type>
+        <tns:status>ACTIVE</tns:status>
+        <tns:owner_name>John Smith</tns:owner_name>
+        <tns:last_transaction_id>TXN-99887</tns:last_transaction_id>
+        <tns:last_transaction_amount>-250.00</tns:last_transaction_amount>
+        <tns:last_transaction_date>2024-01-14T15:22:00</tns:last_transaction_date>
+        <tns:last_transaction_description>PURCHASE AT MERCHANT</tns:last_transaction_description>
+      </tns:GetAccountBalanceResult>
+    </tns:GetAccountBalanceResponse>
+  </soap11env:Body>
+</soap11env:Envelope>

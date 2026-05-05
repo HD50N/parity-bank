@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap11env:Envelope
+  xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="http://paritybank.com/account">
+  <soap11env:Body>
+    <tns:GetAccountBalance>
+      <tns:account_id>ACC-001234</tns:account_id>
+    </tns:GetAccountBalance>
+  </soap11env:Body>
+</soap11env:Envelope>

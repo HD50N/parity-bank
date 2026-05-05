@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Parity Bank — Online Banking</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Verdana, Arial, sans-serif;
+      font-size: 12px;
+      background: #d4d8de;
+      color: #222;
+    }
+
+    /* ---- LOGIN ---- */
+    #login-screen {
+      min-height: 100vh;
+      background: #c8cdd6 url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23b0b5be' fill-opacity='0.4'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: #fff;
+      border: 1px solid #aaa;
+      width: 380px;
+      box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+    }
+    .login-header {
+      background: linear-gradient(to bottom, #1a3a6b, #0d2147);
+      padding: 18px 20px;
+      border-bottom: 3px solid #c8a84b;
+    }
+    .login-header h1 {
+      color: #fff;
+      font-size: 20px;
+      font-family: Georgia, serif;
+      letter-spacing: 1px;
+    }
+    .login-header p {
+      color: #a8c0e0;
+      font-size: 10px;
+      margin-top: 3px;
+      letter-spacing: 0.5px;
+    }
+    .login-body { padding: 24px 20px; }
+    .login-body label {
+      display: block;
+      font-weight: bold;
+      font-size: 11px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .login-body input[type=text],
+    .login-body input[type=password] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #888;
+      font-size: 12px;
+      margin-bottom: 14px;
+      background: #f9f9f9;
+    }
+    .login-body input:focus { border-color: #1a3a6b; outline: none; background: #fff; }
+    .login-btn {
+      width: 100%;
+      padding: 8px;
+      background: linear-gradient(to bottom, #2a5aaa, #1a3a6b);
+      color: #fff;
+      border: 1px solid #0d2147;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+    .login-btn:hover { background: linear-gradient(to bottom, #3468bb, #1e4480); }
+    .login-error { color: #cc0000; font-size: 11px; margin-top: 10px; display: none; }
+    .login-footer {
+      background: #f0f0f0;
+      border-top: 1px solid #ccc;
+      padding: 10px 20px;
+      font-size: 10px;
+      color: #666;
+      text-align: center;
+    }
+    .lock-icon { display: inline; color: #2a5aaa; }
+    .hint { margin-top: 14px; font-size: 10px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
+    .hint strong { color: #444; }
+
+    /* ---- DASHBOARD ---- */
+    #dashboard { display: none; min-height: 100vh; background: #d4d8de; }
+
+    .top-bar {
+      background: linear-gradient(to bottom, #1a3a6b, #0d2147);
+      border-bottom: 3px solid #c8a84b;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+    .top-bar-logo {
+      font-family: Georgia, serif;
+      font-size: 18px;
+      color: #fff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .top-bar-logo span { color: #c8a84b; }
+    .top-bar-user { font-size: 11px; color: #a8c0e0; text-align: right; line-height: 1.6; }
+    .top-bar-user a { color: #c8a84b; text-decoration: none; cursor: pointer; }
+    .top-bar-user a:hover { text-decoration: underline; }
+
+    .nav-bar {
+      background: #2a4a8a;
+      border-bottom: 1px solid #1a3a6b;
+      padding: 0 16px;
+      display: flex;
+      gap: 0;
+    }
+    .nav-bar a {
+      display: inline-block;
+      padding: 9px 16px;
+      color: #c8d8f0;
+      font-size: 11px;
+      font-weight: bold;
+      text-decoration: none;
+      border-right: 1px solid #1a3a6b;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .nav-bar a:hover, .nav-bar a.active { background: #1a3a6b; color: #fff; }
+
+    .notice-bar {
+      background: #ffffcc;
+      border-bottom: 1px solid #ccaa00;
+      padding: 6px 16px;
+      font-size: 11px;
+      color: #665500;
+    }
+
+    .page-content {
+      padding: 14px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .main-col { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    .side-col { width: 240px; display: flex; flex-direction: column; gap: 14px; }
+
+    .box {
+      background: #fff;
+      border: 1px solid #aaa;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+    .box-header {
+      background: linear-gradient(to bottom, #2a4a8a, #1e3a7a);
+      color: #fff;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .box-body { padding: 12px; }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    table.data-table th {
+      background: #e0e6f0;
+      border: 1px solid #aabbd0;
+      padding: 5px 8px;
+      text-align: left;
+      font-weight: bold;
+      color: #1a3a6b;
+      white-space: nowrap;
+    }
+    table.data-table td {
+      border: 1px solid #ccc;
+      padding: 5px 8px;
+      vertical-align: top;
+    }
+    table.data-table tr:nth-child(even) td { background: #f5f7fb; }
+    table.data-table tr:hover td { background: #eef2fa; }
+
+    .amount-credit { color: #006600; font-weight: bold; }
+    .amount-debit { color: #990000; font-weight: bold; }
+    .status-active { color: #006600; font-weight: bold; }
+    .status-frozen { color: #990000; font-weight: bold; }
+
+    .info-row { display: flex; border-bottom: 1px solid #eee; padding: 5px 0; font-size: 11px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #666; width: 110px; flex-shrink: 0; }
+    .info-value { color: #222; font-weight: bold; }
+
+    .form-row { margin-bottom: 10px; }
+    .form-row label { display: block; font-weight: bold; font-size: 11px; color: #333; margin-bottom: 3px; }
+    .form-row input, .form-row select {
+      width: 100%;
+      padding: 5px 6px;
+      border: 1px solid #888;
+      font-size: 11px;
+      background: #f9f9f9;
+      font-family: Verdana, Arial, sans-serif;
+    }
+    .form-row input:focus, .form-row select:focus { border-color: #1a3a6b; outline: none; background: #fff; }
+    .form-btn {
+      width: 100%;
+      padding: 7px;
+      background: linear-gradient(to bottom, #2a5aaa, #1a3a6b);
+      color: #fff;
+      border: 1px solid #0d2147;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-btn:hover { background: linear-gradient(to bottom, #3468bb, #1e4480); }
+    .form-btn:disabled { background: #aaa; border-color: #888; cursor: default; }
+
+    .alert-success {
+      background: #dff0d8; border: 1px solid #3c763d;
+      color: #3c763d; padding: 8px 10px; font-size: 11px; margin-top: 8px;
+    }
+    .alert-error {
+      background: #f2dede; border: 1px solid #a94442;
+      color: #a94442; padding: 8px 10px; font-size: 11px; margin-top: 8px;
+    }
+
+    .balance-big {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1a3a6b;
+      font-family: Georgia, serif;
+    }
+    .balance-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+
+    .loading { color: #666; font-style: italic; padding: 8px 0; font-size: 11px; }
+
+    .txn-filter { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; flex-wrap: wrap; }
+    .txn-filter label { font-size: 10px; font-weight: bold; color: #555; display: block; margin-bottom: 2px; }
+    .txn-filter input { padding: 4px 6px; border: 1px solid #888; font-size: 11px; width: 120px; }
+    .txn-filter button {
+      padding: 5px 12px; background: #2a4a8a; color: #fff;
+      border: 1px solid #1a3a6b; font-size: 11px; cursor: pointer;
+    }
+    .txn-filter button:hover { background: #1a3a6b; }
+
+    .page-footer {
+      background: #1a3a6b;
+      border-top: 3px solid #c8a84b;
+      padding: 10px 16px;
+      color: #a8c0e0;
+      font-size: 10px;
+      text-align: center;
+      line-height: 1.8;
+    }
+    .page-footer strong { color: #c8a84b; }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>&#9632; PARITY BANK</h1>
+      <p>SECURE ONLINE BANKING &nbsp;&bull;&nbsp; EST. 1987</p>
+    </div>
+    <div class="login-body">
+      <label for="account-id">Account ID</label>
+      <input type="text" id="account-id" placeholder="e.g. ACC-001234" autocomplete="off">
+      <label for="pin">Online Banking PIN</label>
+      <input type="password" id="pin" placeholder="&#9679;&#9679;&#9679;&#9679;" maxlength="8">
+      <button class="login-btn" onclick="doLogin()">SIGN IN &rsaquo;</button>
+      <div class="login-error" id="login-error">Invalid Account ID or PIN. Please try again.</div>
+      <div class="hint">
+        <strong>Demo accounts:</strong><br>
+        ACC-001234 &nbsp;&bull;&nbsp; ACC-005678 &nbsp;&bull;&nbsp; ACC-009999 &nbsp;&bull;&nbsp; ACC-007777<br>
+        PIN: any value
+      </div>
+    </div>
+    <div class="login-footer">
+      <span class="lock-icon">&#128274;</span> 128-bit SSL Encrypted Connection &nbsp;&bull;&nbsp; Member FDIC
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard">
+  <div class="top-bar">
+    <div class="top-bar-logo">&#9632; Parity <span>Bank</span></div>
+    <div class="top-bar-user" id="top-bar-user"></div>
+  </div>
+
+  <div class="nav-bar">
+    <a class="active" onclick="showTab('accounts')">Accounts</a>
+    <a onclick="showTab('history')">Transaction History</a>
+    <a onclick="showTab('transfer')">Transfer Funds</a>
+    <a onclick="showTab('profile')">My Profile</a>
+  </div>
+
+  <div class="notice-bar">
+    &#9888;&nbsp; <strong>System Notice:</strong> Scheduled maintenance Sunday 2:00 AM &ndash; 4:00 AM ET. Online banking may be unavailable during this time.
+  </div>
+
+  <!-- ACCOUNTS TAB -->
+  <div id="tab-accounts" class="page-content">
+    <div class="main-col">
+      <div class="box">
+        <div class="box-header">Account Summary</div>
+        <div class="box-body">
+          <div id="account-summary-content"><div class="loading">Loading account information...</div></div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-header">Recent Transactions &mdash; Last 30 Days</div>
+        <div class="box-body">
+          <div id="recent-txn-content"><div class="loading">Loading transactions...</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="side-col">
+      <div class="box">
+        <div class="box-header">Customer Information</div>
+        <div class="box-body">
+          <div id="customer-info-content"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-header">Quick Links</div>
+        <div class="box-body">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <a onclick="showTab('transfer')" style="color:#1a3a6b;font-size:11px;cursor:pointer;text-decoration:underline;">&#8594; Transfer Funds</a>
+            <a onclick="showTab('history')" style="color:#1a3a6b;font-size:11px;cursor:pointer;text-decoration:underline;">&#8594; Full Transaction History</a>
+            <a onclick="showTab('profile')" style="color:#1a3a6b;font-size:11px;cursor:pointer;text-decoration:underline;">&#8594; Update Contact Info</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" class="page-content" style="display:none">
+    <div class="main-col">
+      <div class="box">
+        <div class="box-header">Transaction History</div>
+        <div class="box-body">
+          <div class="txn-filter">
+            <div>
+              <label>From Date</label>
+              <input type="date" id="hist-from" value="2024-01-01">
+            </div>
+            <div>
+              <label>To Date</label>
+              <input type="date" id="hist-to" value="2024-12-31">
+            </div>
+            <button onclick="loadHistory()">Search</button>
+          </div>
+          <div id="history-content"><div class="loading">Select dates and click Search.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSFER TAB -->
+  <div id="tab-transfer" class="page-content" style="display:none">
+    <div class="main-col">
+      <div class="box">
+        <div class="box-header">Transfer Funds</div>
+        <div class="box-body">
+          <p style="font-size:11px;color:#555;margin-bottom:14px;">Transfer funds from your account to another Parity Bank account. Transfers are processed immediately.</p>
+          <div style="max-width:380px;">
+            <div class="form-row">
+              <label>From Account</label>
+              <select id="transfer-from" disabled>
+                <option id="transfer-from-opt"></option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>To Account</label>
+              <select id="transfer-to">
+                <option value="">-- Select destination --</option>
+                <option value="ACC-001234">ACC-001234 &mdash; John Smith (Checking)</option>
+                <option value="ACC-005678">ACC-005678 &mdash; Jane Doe (Savings)</option>
+                <option value="ACC-009999">ACC-009999 &mdash; Bob Johnson (Checking)</option>
+                <option value="ACC-007777">ACC-007777 &mdash; Alice Brown (Checking)</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Amount (USD)</label>
+              <input type="number" id="transfer-amount" placeholder="0.00" min="0.01" step="0.01">
+            </div>
+            <div class="form-row">
+              <label>Reference / Memo</label>
+              <input type="text" id="transfer-ref" placeholder="e.g. RENT-JAN-2024">
+            </div>
+            <button class="form-btn" id="transfer-btn" onclick="doTransfer()">SUBMIT TRANSFER &rsaquo;</button>
+            <div id="transfer-result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="side-col">
+      <div class="box">
+        <div class="box-header">Transfer Information</div>
+        <div class="box-body">
+          <div style="font-size:11px;color:#555;line-height:1.7;">
+            <p>&#9679; Transfers between Parity Bank accounts are immediate.</p><br>
+            <p>&#9679; Maximum single transfer: <strong>$50,000.00</strong></p><br>
+            <p>&#9679; Keep your reference number for your records.</p><br>
+            <p>&#9679; Frozen accounts cannot send or receive transfers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="page-content" style="display:none">
+    <div class="main-col">
+      <div class="box">
+        <div class="box-header">My Profile</div>
+        <div class="box-body">
+          <div id="profile-content"><div class="loading">Loading profile...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <strong>PARITY BANK</strong> &nbsp;&bull;&nbsp; Member FDIC &nbsp;&bull;&nbsp; Equal Housing Lender<br>
+    &copy; 2009 Parity Bank, N.A. All rights reserved. &nbsp;&bull;&nbsp; <span style="color:#7090b0;">Routing #: 021000089</span><br>
+    &#128274; This is a secure, 128-bit SSL encrypted connection. Do not share your PIN with anyone.
+  </div>
+</div>
+
+<script>
+  // ---- State ----
+  let currentAccountId = '';
+  let currentCustomerId = '';
+
+  const ACCOUNT_TO_CUSTOMER = {
+    'ACC-001234': 'CUST-0001',
+    'ACC-005678': 'CUST-0002',
+    'ACC-009999': 'CUST-0003',
+    'ACC-007777': 'CUST-0004',
+  };
+
+  const VALID_ACCOUNTS = Object.keys(ACCOUNT_TO_CUSTOMER);
+
+  // ---- SOAP helper ----
+  async function soapCall(service, operation, namespace, params) {
+    const paramsXml = Object.entries(params)
+      .map(([k, v]) => `<tns:${k}>${v}</tns:${k}>`)
+      .join('\n      ');
+
+    const envelope = `<?xml version="1.0" encoding="UTF-8"?>
+<soap11env:Envelope
+  xmlns:soap11env="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="${namespace}">
+  <soap11env:Body>
+    <tns:${operation}>
+      ${paramsXml}
+    </tns:${operation}>
+  </soap11env:Body>
+</soap11env:Envelope>`;
+
+    const res = await fetch(`/${service}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/xml' },
+      body: envelope,
+    });
+    const text = await res.text();
+    return new DOMParser().parseFromString(text, 'text/xml');
+  }
+
+  function xmlVal(doc, localName) {
+    const els = doc.getElementsByTagName('*');
+    for (let i = 0; i < els.length; i++) {
+      if (els[i].localName === localName) return els[i].textContent.trim();
+    }
+    return '';
+  }
+
+  function xmlEls(doc, localName) {
+    const all = doc.getElementsByTagName('*');
+    const result = [];
+    for (let i = 0; i < all.length; i++) {
+      if (all[i].localName === localName) result.push(all[i]);
+    }
+    return result;
+  }
+
+  function fmt(amount) {
+    const n = parseFloat(amount);
+    if (isNaN(n)) return amount;
+    return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(dt) {
+    if (!dt) return '';
+    return dt.replace('T', ' ').substring(0, 16);
+  }
+
+  // ---- Login ----
+  async function doLogin() {
+    const accountId = document.getElementById('account-id').value.trim().toUpperCase();
+    const pin = document.getElementById('pin').value.trim();
+    const errEl = document.getElementById('login-error');
+
+    if (!VALID_ACCOUNTS.includes(accountId) || pin.length < 1) {
+      errEl.style.display = 'block';
+      return;
+    }
+
+    errEl.style.display = 'none';
+    currentAccountId = accountId;
+    currentCustomerId = ACCOUNT_TO_CUSTOMER[accountId];
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+
+    // Set transfer from account
+    document.getElementById('transfer-from-opt').value = accountId;
+    document.getElementById('transfer-from-opt').textContent = accountId;
+
+    // Remove self from transfer-to options
+    const toSelect = document.getElementById('transfer-to');
+    for (let i = toSelect.options.length - 1; i >= 0; i--) {
+      if (toSelect.options[i].value === accountId) toSelect.remove(i);
+    }
+
+    loadAccountSummary();
+    loadRecentTransactions();
+    loadCustomerInfo();
+  }
+
+  document.getElementById('pin').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('account-id').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('pin').focus();
+  });
+
+  // ---- Account summary ----
+  async function loadAccountSummary() {
+    const doc = await soapCall('account', 'GetAccountBalance',
+      'http://paritybank.com/account', { account_id: currentAccountId });
+
+    const balance = xmlVal(doc, 'balance');
+    const type = xmlVal(doc, 'account_type');
+    const status = xmlVal(doc, 'status');
+    const owner = xmlVal(doc, 'owner_name');
+    const currency = xmlVal(doc, 'currency');
+    const lastId = xmlVal(doc, 'last_transaction_id');
+    const lastAmt = xmlVal(doc, 'last_transaction_amount');
+    const lastDate = xmlVal(doc, 'last_transaction_date');
+    const lastDesc = xmlVal(doc, 'last_transaction_description');
+
+    const statusClass = status === 'ACTIVE' ? 'status-active' : 'status-frozen';
+    const amtClass = parseFloat(lastAmt) < 0 ? 'amount-debit' : 'amount-credit';
+
+    // Update top bar
+    document.getElementById('top-bar-user').innerHTML =
+      `Welcome, <strong style="color:#fff">${owner}</strong> &nbsp;|&nbsp; Account: ${currentAccountId} &nbsp;|&nbsp; Last Login: Jan 15, 2024 10:14 AM &nbsp;|&nbsp; <a onclick="signOut()">Sign Out</a>`;
+
+    document.getElementById('account-summary-content').innerHTML = `
+      <table class="data-table" style="margin-bottom:16px;">
+        <thead>
+          <tr>
+            <th>Account ID</th>
+            <th>Account Type</th>
+            <th>Status</th>
+            <th>Currency</th>
+            <th>Current Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>${currentAccountId}</strong></td>
+            <td>${type}</td>
+            <td class="${statusClass}">${status}</td>
+            <td>${currency}</td>
+            <td style="text-align:right;">
+              <div class="balance-label">Available Balance</div>
+              <div class="balance-big">${fmt(balance)}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      ${lastId ? `
+      <div style="font-size:11px;color:#555;border-top:1px solid #e0e0e0;padding-top:10px;">
+        <strong>Most Recent Transaction:</strong> &nbsp;
+        <span style="color:#666;">${fmtDate(lastDate)}</span> &mdash;
+        ${lastDesc} &mdash;
+        <span class="${amtClass}">${parseFloat(lastAmt) < 0 ? '-' : '+'}${fmt(lastAmt)}</span>
+        &nbsp;<span style="color:#aaa;">(${lastId})</span>
+      </div>` : ''}
+    `;
+  }
+
+  // ---- Recent transactions ----
+  async function loadRecentTransactions() {
+    const doc = await soapCall('transaction', 'GetTransactionHistory',
+      'http://paritybank.com/transaction', {
+        account_id: currentAccountId,
+        from_date: '2024-01-01',
+        to_date: '2024-12-31',
+      });
+
+    const items = xmlEls(doc, 'TransactionItem');
+    if (items.length === 0) {
+      document.getElementById('recent-txn-content').innerHTML =
+        '<p style="color:#666;font-size:11px;font-style:italic;">No transactions found in this period.</p>';
+      return;
+    }
+
+    let rows = '';
+    for (const item of items) {
+      function v(tag) {
+        const els = item.getElementsByTagName('*');
+        for (let i = 0; i < els.length; i++) {
+          if (els[i].localName === tag) return els[i].textContent.trim();
+        }
+        return '';
+      }
+      const amt = v('amount');
+      const amtClass = parseFloat(amt) < 0 ? 'amount-debit' : 'amount-credit';
+      const sign = parseFloat(amt) < 0 ? '' : '+';
+      rows += `<tr>
+        <td>${fmtDate(v('date'))}</td>
+        <td>${v('id')}</td>
+        <td>${v('description')}</td>
+        <td style="text-align:center;">${v('type')}</td>
+        <td style="text-align:right;" class="${amtClass}">${sign}${fmt(amt)}</td>
+        <td style="text-align:right;">${fmt(v('balance_after'))}</td>
+      </tr>`;
+    }
+
+    document.getElementById('recent-txn-content').innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date / Time</th>
+            <th>Transaction ID</th>
+            <th>Description</th>
+            <th style="text-align:center;">Type</th>
+            <th style="text-align:right;">Amount</th>
+            <th style="text-align:right;">Balance After</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // ---- Full history ----
+  async function loadHistory() {
+    const from = document.getElementById('hist-from').value;
+    const to = document.getElementById('hist-to').value;
+    document.getElementById('history-content').innerHTML = '<div class="loading">Loading transactions...</div>';
+
+    const doc = await soapCall('transaction', 'GetTransactionHistory',
+      'http://paritybank.com/transaction', {
+        account_id: currentAccountId,
+        from_date: from,
+        to_date: to,
+      });
+
+    const items = xmlEls(doc, 'TransactionItem');
+    const count = xmlVal(doc, 'transaction_count');
+
+    if (items.length === 0) {
+      document.getElementById('history-content').innerHTML =
+        '<p style="color:#666;font-size:11px;font-style:italic;">No transactions found for this date range.</p>';
+      return;
+    }
+
+    let rows = '';
+    for (const item of items) {
+      function v(tag) {
+        const els = item.getElementsByTagName('*');
+        for (let i = 0; i < els.length; i++) {
+          if (els[i].localName === tag) return els[i].textContent.trim();
+        }
+        return '';
+      }
+      const amt = v('amount');
+      const amtClass = parseFloat(amt) < 0 ? 'amount-debit' : 'amount-credit';
+      const sign = parseFloat(amt) < 0 ? '' : '+';
+      rows += `<tr>
+        <td>${fmtDate(v('date'))}</td>
+        <td>${v('id')}</td>
+        <td>${v('description')}</td>
+        <td style="text-align:center;">${v('type')}</td>
+        <td style="text-align:right;" class="${amtClass}">${sign}${fmt(amt)}</td>
+        <td style="text-align:right;">${fmt(v('balance_after'))}</td>
+      </tr>`;
+    }
+
+    document.getElementById('history-content').innerHTML = `
+      <p style="font-size:11px;color:#555;margin-bottom:8px;">
+        Showing <strong>${count}</strong> transaction(s) from <strong>${from}</strong> to <strong>${to}</strong>
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date / Time</th>
+            <th>Transaction ID</th>
+            <th>Description</th>
+            <th style="text-align:center;">Type</th>
+            <th style="text-align:right;">Amount</th>
+            <th style="text-align:right;">Balance After</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // ---- Customer info ----
+  async function loadCustomerInfo() {
+    const doc = await soapCall('customer', 'GetCustomerInfo',
+      'http://paritybank.com/customer', { customer_id: currentCustomerId });
+
+    const first = xmlVal(doc, 'first_name');
+    const last = xmlVal(doc, 'last_name');
+    const email = xmlVal(doc, 'email');
+    const phone = xmlVal(doc, 'phone');
+    const address = xmlVal(doc, 'address');
+    const custId = xmlVal(doc, 'customer_id');
+
+    document.getElementById('customer-info-content').innerHTML = `
+      <div class="info-row"><span class="info-label">Customer ID</span><span class="info-value">${custId}</span></div>
+      <div class="info-row"><span class="info-label">Name</span><span class="info-value">${first} ${last}</span></div>
+      <div class="info-row"><span class="info-label">Email</span><span class="info-value">${email}</span></div>
+      <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${phone}</span></div>
+      <div class="info-row"><span class="info-label">Address</span><span class="info-value">${address}</span></div>
+    `;
+
+    document.getElementById('profile-content').innerHTML = `
+      <table class="data-table" style="max-width:500px;">
+        <tbody>
+          <tr><td><strong>Customer ID</strong></td><td>${custId}</td></tr>
+          <tr><td><strong>Full Name</strong></td><td>${first} ${last}</td></tr>
+          <tr><td><strong>Email Address</strong></td><td>${email}</td></tr>
+          <tr><td><strong>Phone Number</strong></td><td>${phone}</td></tr>
+          <tr><td><strong>Mailing Address</strong></td><td>${address}</td></tr>
+          <tr><td><strong>Primary Account</strong></td><td>${currentAccountId}</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:10px;color:#888;margin-top:12px;">To update your contact information, please visit your nearest Parity Bank branch or call 1-800-PARITY-1.</p>
+    `;
+  }
+
+  // ---- Transfer ----
+  async function doTransfer() {
+    const toId = document.getElementById('transfer-to').value;
+    const amount = document.getElementById('transfer-amount').value;
+    const ref = document.getElementById('transfer-ref').value.trim() || 'ONLINE-TRANSFER';
+    const resultEl = document.getElementById('transfer-result');
+    const btn = document.getElementById('transfer-btn');
+
+    if (!toId) { resultEl.innerHTML = '<div class="alert-error">Please select a destination account.</div>'; return; }
+    if (!amount || parseFloat(amount) <= 0) { resultEl.innerHTML = '<div class="alert-error">Please enter a valid amount.</div>'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+    resultEl.innerHTML = '';
+
+    try {
+      const doc = await soapCall('transfer', 'TransferFunds',
+        'http://paritybank.com/transfer', {
+          from_account_id: currentAccountId,
+          to_account_id: toId,
+          amount: parseFloat(amount).toFixed(2),
+          reference: ref,
+        });
+
+      const fault = xmlVal(doc, 'faultstring');
+      if (fault) {
+        resultEl.innerHTML = `<div class="alert-error"><strong>Transfer Failed:</strong> ${fault}</div>`;
+      } else {
+        const confId = xmlVal(doc, 'confirmation_id');
+        const fromAfter = xmlVal(doc, 'from_balance_after');
+        const ts = xmlVal(doc, 'timestamp');
+        resultEl.innerHTML = `
+          <div class="alert-success">
+            <strong>Transfer Successful</strong><br>
+            Confirmation ID: <strong>${confId}</strong><br>
+            Amount: <strong>${fmt(amount)}</strong> to ${toId}<br>
+            New Balance: <strong>${fmt(fromAfter)}</strong><br>
+            Processed: ${fmtDate(ts)} UTC
+          </div>`;
+        // Refresh balance
+        loadAccountSummary();
+      }
+    } catch (e) {
+      resultEl.innerHTML = `<div class="alert-error">Connection error. Please try again.</div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'SUBMIT TRANSFER ›';
+  }
+
+  // ---- Tab switching ----
+  function showTab(tab) {
+    ['accounts','history','transfer','profile'].forEach(t => {
+      document.getElementById(`tab-${t}`).style.display = t === tab ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.nav-bar a').forEach((a, i) => {
+      a.classList.toggle('active', ['accounts','history','transfer','profile'][i] === tab);
+    });
+    if (tab === 'history') loadHistory();
+  }
+
+  // ---- Sign out ----
+  function signOut() {
+    currentAccountId = '';
+    currentCustomerId = '';
+    document.getElementById('account-id').value = '';
+    document.getElementById('pin').value = '';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+</script>
+</body>
+</html>
