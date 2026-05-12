@@ -1,0 +1,87 @@
+openapi: 3.0.3
+info:
+  title: Customer Service API
+  description: REST API for customer information retrieval
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+paths:
+  /customers/{customer_id}:
+    get:
+      summary: Get customer information
+      description: Retrieves customer details by customer ID
+      operationId: getCustomerInfo
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          description: The unique identifier of the customer
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        customer_id:
+          type: string
+          description: Unique identifier of the customer
+        first_name:
+          type: string
+          description: Customer's first name
+        last_name:
+          type: string
+          description: Customer's last name
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+        phone:
+          type: string
+          description: Customer's phone number
+        address:
+          type: string
+          description: Customer's address
+        primary_account_id:
+          type: string
+          description: Primary account identifier
+      required:
+        - customer_id
+        - first_name
+        - last_name
+        - email
+        - phone
+        - address
+        - primary_account_id
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message

@@ -1,0 +1,13 @@
+Integration Steps for Customer REST API:
+
+1. Add import to server.py:
+   from generated.reconcile_migrations.customer_service.rest_router import customer_rest_bp
+
+2. Register the REST blueprint in server.py (add after existing blueprints):
+   app.register_blueprint(customer_rest_bp, url_prefix="")
+
+3. Test the REST endpoint:
+   GET http://localhost:8000/customers/12345
+
+Note: The new REST API will coexist with the existing SOAP service at /customer.
+The REST endpoint follows the OpenAPI spec at /customers/{customer_id}.
