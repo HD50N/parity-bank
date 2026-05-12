@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: Transaction Service API
+  version: 1.0.0
+  description: REST API for retrieving account transaction history.
+servers:
+  - url: http://localhost:8000
+paths:
+  /accounts/{accountId}/transactions:
+    get:
+      summary: Get transaction history for an account
+      operationId: getTransactionHistory
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: The account identifier
+          schema:
+            type: string
+        - name: from_date
+          in: query
+          required: false
+          description: Start date filter (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          required: false
+          description: End date filter (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Transaction history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionHistoryResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    TransactionItem:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+          format: double
+        date:
+          type: string
+          format: date-time
+        description:
+          type: string
+        type:
+          type: string
+        balance_after:
+          type: number
+          format: double
+    TransactionHistoryResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+        from_date:
+          type: string
+        to_date:
+          type: string
+        transaction_count:
+          type: integer
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionItem'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
